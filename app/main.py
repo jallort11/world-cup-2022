@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 
 from app.data_loader import load_players, load_teams
+from app.teams import team_profile
 
 app = FastAPI(
     title="World Cup 2022 API",
@@ -22,6 +23,8 @@ def root():
         "docs": "/docs",
     }
 
+
+app.get("/teams/{team}")(team_profile)
 
 @app.get("/players/most-played")
 def most_played(
