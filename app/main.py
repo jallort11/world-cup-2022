@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.data_loader import load_players, load_teams
+from app.teams import team_profile
 
 app = FastAPI(
     title="World Cup 2022 API",
@@ -23,6 +24,7 @@ def root():
     }
 
 
+app.get("/teams/{team}")(team_profile)
 # -----------------------------------------------------------------------------
 # STUDENT EXERCISE
 # -----------------------------------------------------------------------------
