@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from typing import Literal
+
+from fastapi import FastAPI, Query
 
 from app.data_loader import load_players, load_teams
 
@@ -29,8 +31,19 @@ def root():
 # Implement the endpoints described in README.md.
 # Suggested routes:
 #   GET /players/most-played
-#   GET /players/top-scorers
 #   GET /teams/ranking
 #   GET /teams/{team}
 #
 # Do not implement them on main: each team should work on its own Git branch.
+
+@app.get("/players/top-scorers")
+def top_scorers(
+    limit: int = Query(10, ge=1),
+    sort_by: Literal["goals", "assists"] = Query("goals"),
+):
+    ranked = (
+        players.sort_values(by=[sort_by], ascending=False)
+        .head(limit)[["player", "team", "goals", "assists"]]
+        .astype({"goals": int, "assists": int})
+    )
+    return ranked.to_dict(orient="records")
