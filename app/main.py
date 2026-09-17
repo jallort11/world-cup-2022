@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
+from typing import Literal
 
 from app.data_loader import load_players, load_teams
 
