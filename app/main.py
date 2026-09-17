@@ -1,3 +1,5 @@
+from fastapi import FastAPI, Query
+from typing import Literal
 from fastapi import FastAPI, HTTPException, Query
 
 from app.data_loader import load_players, load_teams
@@ -23,6 +25,17 @@ def root():
         "docs": "/docs",
     }
 
+@app.get("/players/top-scorers")
+def top_scorers(
+    limit: int = Query(10, ge=1),
+    sort_by: Literal["goals", "assists"] = Query("goals"),
+):
+    ranked = (
+        players.sort_values(by=[sort_by], ascending=False)
+        .head(limit)[["player", "team", "goals", "assists"]]
+        .astype({"goals": int, "assists": int})
+    )
+    return ranked.to_dict(orient="records")
 
 app.get("/teams/{team}")(team_profile)
 
