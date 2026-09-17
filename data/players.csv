@@ -1,0 +1,41 @@
+player,team,position,age,minutes,goals,assists,starts
+Lionel Messi,Argentina,FW,35,690,7,3,7
+Emiliano Martinez,Argentina,GK,30,690,0,0,7
+Julian Alvarez,Argentina,FW,22,467,4,0,5
+Kylian Mbappe,France,FW,23,598,8,2,6
+Hugo Lloris,France,GK,35,570,0,0,6
+Olivier Giroud,France,FW,36,424,4,0,6
+Luka Modric,Croatia,MF,37,656,0,0,7
+Dominik Livakovic,Croatia,GK,27,690,0,0,7
+Josko Gvardiol,Croatia,DF,20,690,1,0,7
+Yassine Bounou,Morocco,GK,31,570,0,0,6
+Achraf Hakimi,Morocco,DF,24,570,0,1,6
+Hakim Ziyech,Morocco,FW,29,570,1,1,6
+Harry Kane,England,FW,29,404,2,3,5
+Jude Bellingham,England,MF,19,423,1,1,5
+Bukayo Saka,England,FW,21,288,3,0,4
+Neymar,Brazil,FW,30,293,2,1,3
+Vinicius Junior,Brazil,FW,22,341,1,2,4
+Casemiro,Brazil,MF,30,390,1,0,4
+Bruno Fernandes,Portugal,MF,28,356,2,3,4
+Cristiano Ronaldo,Portugal,FW,37,291,1,0,3
+Goncalo Ramos,Portugal,FW,21,153,3,1,2
+Cody Gakpo,Netherlands,FW,23,455,3,0,5
+Frenkie de Jong,Netherlands,MF,25,475,1,1,5
+Virgil van Dijk,Netherlands,DF,31,480,0,0,5
+Alvaro Morata,Spain,FW,30,185,3,1,1
+Pedri,Spain,MF,20,388,0,0,4
+Gavi,Spain,MF,18,284,1,0,4
+Ritsu Doan,Japan,FW,24,229,2,0,2
+Daichi Kamada,Japan,MF,26,326,0,0,4
+Kaoru Mitoma,Japan,FW,25,164,0,1,0
+Youssef En-Nesyri,Morocco,FW,25,464,2,0,6
+Memphis Depay,Netherlands,FW,28,299,1,0,4
+Richarlison,Brazil,FW,25,325,3,0,4
+Antoine Griezmann,France,MF,31,538,0,3,6
+Enzo Fernandez,Argentina,MF,21,563,1,1,5
+Alexis Mac Allister,Argentina,MF,23,555,1,1,6
+Ivan Perisic,Croatia,FW,33,632,1,2,7
+Andre Kramaric,Croatia,FW,31,458,2,0,6
+Dani Olmo,Spain,FW,24,368,1,1,4
+Marco Asensio,Spain,FW,26,230,1,0,3
