@@ -1,7 +1,8 @@
-﻿from fastapi import FastAPI, HTTPException, Query
 from fastapi import FastAPI, HTTPException, Query
+from typing import Literal
 
 from app.data_loader import load_players, load_teams
+from app.teams import team_profile
 
 app = FastAPI(
     title="World Cup 2022 API",
@@ -23,6 +24,19 @@ def root():
         "docs": "/docs",
     }
 
+@app.get("/players/top-scorers")
+def top_scorers(
+    limit: int = Query(10, ge=1),
+    sort_by: Literal["goals", "assists"] = Query("goals"),
+):
+    ranked = (
+        players.sort_values(by=[sort_by], ascending=False)
+        .head(limit)[["player", "team", "goals", "assists"]]
+        .astype({"goals": int, "assists": int})
+    )
+    return ranked.to_dict(orient="records")
+
+app.get("/teams/{team}")(team_profile)
 
 @app.get("/players/most-played")
 def most_played(
