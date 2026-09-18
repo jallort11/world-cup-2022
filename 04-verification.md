@@ -65,6 +65,8 @@ Automated suite: **12 passed** locally (`pytest -q`) and on GitHub Actions (`pyt
 
 ## How to run
 
+See [README.md](README.md) for setup, API examples, dashboard, tests, and CI.
+
 ```bash
 source .venv/bin/activate
 pip install -r requirements.txt

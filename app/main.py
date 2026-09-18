@@ -12,7 +12,7 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 app = FastAPI(
     title="World Cup 2022 API",
-    description="Programming Thinking exercise: build a data API with FastAPI.",
+    description="Programming Thinking exercise: World Cup 2022 data API and dashboard. See README.md.",
     version="0.1.0",
 )
 

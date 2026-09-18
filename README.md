@@ -1,59 +1,144 @@
-# Spec-Driven Development Template Kit
+# World Cup 2022 API
 
-This kit keeps intent, design, implementation, and verification separate so an AI assistant has a clear, reviewable source of truth.
+FastAPI teaching project for **Programming Thinking**. It serves 2022 World Cup player and team stats from CSV files, plus a browser dashboard that visualizes those endpoints.
 
-This repository uses the kit for **Team 2**: a World Cup 2022 API dashboard, pytest coverage, and GitHub Actions that run tests on pull requests to `main` (`.github/workflows/tests.yml`).
+Team 2 added the dashboard, pytest coverage, and GitHub Actions.
 
-## Files
+## Quick start
 
-```text
-.
-├── README.md
-├── 00-constitution.md
-├── 01-requirements.md
-├── 02-design.md
-├── 03-tasks.md
-├── 04-verification.md
-├── assets/
-└── .github/workflows/tests.yml   # CI: pytest on PRs and pushes to main
+```bash
+python3 -m venv .venv
+source .venv/bin/activate       # macOS/Linux
+# .venv\Scripts\activate        # Windows
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
-Store mocks, screenshots, prototype exports, and sample data in `assets/`. In the requirements file, label every asset as **Binding** or **Inspiration**.
+If port 8000 is already in use:
 
-## How to use the kit
-
-1. Set the stable rules in `00-constitution.md`.
-2. Write and approve `01-requirements.md`. Do not design or code yet.
-3. Create and approve `02-design.md`.
-4. Generate and review `03-tasks.md`.
-5. Implement only approved tasks and record evidence in `04-verification.md`.
-6. Run a final traceability review. Any gap becomes a new task; do not change requirements merely to hide it.
-7. Pull requests to `main` must keep the GitHub Actions `pytest` check green.
-
-## Working rules for the AI
-
-- Work on one phase at a time and update only its file.
-- Ask questions before making high-impact assumptions. Use `[QUESTION]` and `[ASSUMPTION]`.
-- Do not start implementation until requirements, design, and tasks are approved.
-- Link decisions, tasks, and tests to requirement IDs.
-- Stop and request approval when a binding mock conflicts with a requirement or design.
-- Do not merge to `main` while the CI `pytest` job is red.
-
-## Copy-and-paste instruction
-
-```text
-Read README.md, 00-constitution.md, and the current phase file.
-Update only the current phase file. Keep requirement IDs traceable.
-Use [QUESTION] for unresolved information and [ASSUMPTION] for explicit inferences.
-Do not move to the next phase or write code without approval.
+```bash
+uvicorn app.main:app --reload --port 8001
 ```
 
-## Method references
+| Page | URL |
+|------|-----|
+| Dashboard | http://127.0.0.1:8000/dashboard |
+| API welcome | http://127.0.0.1:8000 |
+| Swagger UI | http://127.0.0.1:8000/docs |
 
-This kit follows the common flow of requirements → design → tasks → implementation → verification:
+## Dashboard
 
-- [GitHub Spec Kit](https://github.github.io/spec-kit/) — Specify → Plan → Tasks → Implement → Converge, with optional quality gates.
-- [Kiro Feature Specs](https://kiro.dev/docs/specs/feature-specs/) — requirements, design, and tasks; EARS requirements and acceptance criteria.
-- [OpenSpec overview](https://raw.githubusercontent.com/Fission-AI/OpenSpec/main/docs/overview.md) — proposal, specification deltas, design, tasks, and an archive step for existing systems.
+`GET /dashboard` loads a single page that calls the JSON API:
 
-Primary sources: [Spec Kit](https://github.github.io/spec-kit/), [Agentic SDD reference](https://github.github.io/spec-kit/reference/agentic-sdd.html), [Kiro Feature Specs](https://kiro.dev/docs/specs/feature-specs/), [OpenSpec overview](https://raw.githubusercontent.com/Fission-AI/OpenSpec/main/docs/overview.md).
+- Overview from `GET /`
+- Top scorers chart and table (`limit`, `sort_by=goals|assists`)
+- Most minutes chart and table (`limit`, optional team)
+- Team profile lookup (`GET /teams/{team}`)
+
+Each panel shows loading, empty, and error states. Charts have a data table underneath.
+
+## API
+
+Interactive docs: http://127.0.0.1:8000/docs
+
+### `GET /`
+
+Returns how many rows were loaded and links to docs and the dashboard.
+
+```json
+{
+  "message": "Welcome to the World Cup 2022 API",
+  "players_loaded": 40,
+  "teams_loaded": 32,
+  "docs": "/docs",
+  "dashboard": "/dashboard"
+}
+```
+
+### `GET /players/top-scorers`
+
+| Query | Default | Notes |
+|-------|---------|--------|
+| `limit` | `10` | Must be ≥ 1 (otherwise 422) |
+| `sort_by` | `goals` | `goals` or `assists`. Anything else (e.g. `bananas`) → 422 |
+
+```http
+GET /players/top-scorers?limit=10
+GET /players/top-scorers?sort_by=assists&limit=5
+```
+
+```json
+[
+  {"player": "Kylian Mbappe", "team": "France", "goals": 8, "assists": 2}
+]
+```
+
+### `GET /players/most-played`
+
+| Query | Default | Notes |
+|-------|---------|--------|
+| `limit` | `10` | Must be ≥ 1 (otherwise 400) |
+| `team` | omitted | Case-insensitive. Unknown team → 404 |
+
+```http
+GET /players/most-played?limit=10
+GET /players/most-played?limit=10&team=Argentina
+```
+
+```json
+[
+  {"player": "Lionel Messi", "team": "Argentina", "minutes": 690}
+]
+```
+
+### `GET /teams/{team}`
+
+```http
+GET /teams/Argentina
+```
+
+```json
+{
+  "team": "Argentina",
+  "players": 5,
+  "total_goals": 15,
+  "total_assists": 8,
+  "average_age": 26.2,
+  "top_scorer": "Lionel Messi"
+}
+```
+
+Unknown team currently returns `{"detail": "Team not found"}` with HTTP 200 (existing contract).
+
+## Tests
+
+```bash
+source .venv/bin/activate
+pytest
+```
+
+The suite covers top scorers, most-played, team profile, and that `/dashboard` is served.
+
+## CI
+
+Pull requests and pushes to `main` run `.github/workflows/tests.yml` (job **pytest**): install `requirements.txt`, then `pytest -q`.
+
+Do not merge while that check is red. Optional: in GitHub, protect `main` with **Require status checks to pass** → `pytest`.
+
+## Dataset
+
+Teaching CSVs in `data/` (`players.csv`, `teams.csv`). See `data/README.md`. Not an official statistical source.
+
+## Spec-driven documents
+
+This change was specified before code. Start here if you are reviewing the process:
+
+| File | Role |
+|------|------|
+| [00-constitution.md](00-constitution.md) | Stable rules |
+| [01-requirements.md](01-requirements.md) | User stories and requirements |
+| [assets/m-001-dashboard-wireframe.md](assets/m-001-dashboard-wireframe.md) | Binding UI plan |
+| [02-design.md](02-design.md) | Design |
+| [03-tasks.md](03-tasks.md) | Tasks |
+| [04-verification.md](04-verification.md) | Evidence |
+| [docs/sdd-kit.md](docs/sdd-kit.md) | How to use the SDD kit |
