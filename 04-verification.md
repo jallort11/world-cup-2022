@@ -1,7 +1,7 @@
 # Verification: World Cup 2022 API dashboard
 
 **Change ID:** dashboard-api-viz  
-**Specification version:** v1.0  
+**Specification version:** v1.1  
 **Status:** Verified
 
 ## Evidence by requirement
@@ -16,8 +16,9 @@
 | VT-011 / FR-004 | Given most-played defaults, Argentina filter, unknown team, limit=0 | Test | `test_most_played_*` | Pass |
 | VT-012 / FR-005 | Given `/teams/Argentina` and `/teams/Patatonia` | Test | `test_team_profile_*` | Pass |
 | VT-013 / NFR-001, NFR-002 | Given the dashboard, when tabbing, controls have names Limit, Scorers sort, Minutes team, Apply, Reset, Team name, Look up | Manual | Accessibility snapshot of `/dashboard` | Pass |
+| VT-014 / FR-012, C-004 | Given PR #6 targets `main`, when GitHub Actions runs, then the `pytest` job passes | CI | [pytest on PR #6](https://github.com/jallort11/world-cup-2022/actions/runs/35334707881/job/105566757503) | Pass |
 
-Automated suite: **12 passed** (`pytest -q`).
+Automated suite: **12 passed** locally (`pytest -q`) and on GitHub Actions (`pytest` check, 23s).
 
 ## Binding-asset validation
 
@@ -48,6 +49,8 @@ Automated suite: **12 passed** (`pytest -q`).
 | C-001 | static HTML/CSS/JS | T-010, T-012 | files under `app/static/` | Covered |
 | C-002 | no ranking endpoint | — | `app/main.py` has no `/teams/ranking` | Covered |
 | C-003 | pytest | T-001 | pytest.ini + 12 passed | Covered |
+| C-004 | D-006 | T-024 | VT-014 | Covered |
+| FR-012 | D-006 | T-024 | VT-014 | Covered |
 
 ## Findings
 
@@ -70,5 +73,7 @@ pytest
 ```
 
 Open http://127.0.0.1:8000/dashboard
+
+Pull requests to `main` run `.github/workflows/tests.yml` (job `pytest`). Evidence: [PR #6 check](https://github.com/jallort11/world-cup-2022/actions/runs/35334707881/job/105566757503).
 
 **Reviewed by / date:** Agent verification 2026-09-18

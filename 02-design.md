@@ -1,12 +1,12 @@
 # Design: World Cup 2022 API dashboard
 
 **Change ID:** dashboard-api-viz  
-**Requirements version:** v1.0  
+**Requirements version:** v1.1  
 **Status:** Approved
 
 ## Solution summary
 
-Serve a single static page from FastAPI at `/dashboard`. Browser JavaScript calls the existing JSON endpoints and renders CSS bar charts plus tables. Pytest + TestClient covers endpoint contracts and that the dashboard HTML includes the M-001 regions.
+Serve a single static page from FastAPI at `/dashboard`. Browser JavaScript calls the existing JSON endpoints and renders CSS bar charts plus tables. Pytest + TestClient covers endpoint contracts and that the dashboard HTML includes the M-001 regions. GitHub Actions runs that suite on pull requests to `main`.
 
 ## Coverage
 
@@ -30,6 +30,8 @@ Serve a single static page from FastAPI at `/dashboard`. Browser JavaScript call
 | C-001 | Static files, no SPA framework | — | No |
 | C-002 | No ranking endpoint | — | No |
 | C-003 | pytest | — | No |
+| C-004 | `.github/workflows/tests.yml` | — | No |
+| FR-012 | GitHub Actions job `pytest` on PRs to `main` | — | No |
 
 ## Architecture and flow
 
@@ -40,6 +42,7 @@ Browser  --GET /players/top-scorers-->  top_scorers()
 Browser  --GET /players/most-played-->  most_played()
 Browser  --GET /teams/{team}-->         team_profile()
 pytest   --TestClient-->      same routes
+GitHub Actions --PR to main-->  pip install -r requirements.txt && pytest -q
 ```
 
 On load: overview + scorers + minutes (three requests). Profile waits for submit.
@@ -55,6 +58,7 @@ On load: overview + scorers + minutes (three requests). Profile waits for submit
 | Existing endpoints | Unchanged contracts | current query params and fields | FR-010 |
 | `tests/test_api.py` | Endpoint behavior | pytest | FR-011 |
 | `tests/test_dashboard.py` | Page served and structure | pytest | FR-001, FR-011, NFR-004 |
+| `.github/workflows/tests.yml` | CI gate on PRs to `main` | pytest on GitHub-hosted Python 3.12 | FR-012, C-004 |
 
 ## Decisions
 
@@ -65,6 +69,7 @@ On load: overview + scorers + minutes (three requests). Profile waits for submit
 | D-003 | Profile empty until lookup | Auto-load Argentina | A-002; avoids inventing a default team | First paint has no profile numbers |
 | D-004 | Treat team-profile `{detail}` without `team` as error | Change API to HTTP 404 | FR-010: do not change existing contract | UI must inspect payload shape |
 | D-005 | pytest + TestClient, not browser E2E | Playwright | C-003; course-sized suite | Keyboard/visual checks are manual (VT-a11y) |
+| D-006 | GitHub Actions for CI | GitLab CI; local-only pytest | Already on GitHub; FR-012 needs a check on the PR | Token needs `workflow` scope to push `.yml` files |
 
 ## States and test strategy
 
@@ -83,6 +88,7 @@ On load: overview + scorers + minutes (three requests). Profile waits for submit
 | FR-005, FR-011 | Integration | Known team profile fields; unknown team `detail` |
 | FR-006–FR-008 | Manual | Loading/error/empty visible in the section |
 | NFR-001, NFR-002 | Manual | Keyboard tab through filters; labels present (also asserted in HTML test) |
+| FR-012, C-004 | CI | Green `pytest` check on the pull request |
 
 ## Approval checklist
 

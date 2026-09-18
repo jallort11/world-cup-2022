@@ -2,13 +2,13 @@
 
 **Change ID:** dashboard-api-viz  
 **Status:** Approved  
-**Version:** v1.0  
-**Owner:** feature/sdd-kit
+**Version:** v1.1  
+**Owner:** feature/team-2-dashboard
 
 ## Objective
 
 **Problem:** The API is only usable through `/docs` or raw JSON. A student or reviewer cannot see endpoint results as charts and tables.  
-**Success measure:** Opening `/dashboard` shows live data from the existing player and team endpoints, filters update those views, and pytest covers API behavior plus dashboard serving.  
+**Success measure:** Opening `/dashboard` shows live data from the existing player and team endpoints, filters update those views, pytest covers API behavior plus dashboard serving, and pull requests to `main` run that suite in CI.  
 **Out of scope:** New API endpoints (including `/teams/ranking`), authentication, persistence, deployment, and mobile-native apps.
 
 ## Visual and reference material
@@ -77,6 +77,17 @@ No image mock exists. M-001 is the binding UI plan. Error, empty, and loading co
 
 - Given the test suite is run, when it finishes, then tests covering top-scorers, most-played, team profile, and dashboard HTML have passed.
 
+### US-006 — Block merge until tests pass, P1
+
+**As a** reviewer  
+**I want** GitHub Actions to run pytest on every pull request to `main`  
+**So that** a failing suite is visible before merge.
+
+**Acceptance criteria**
+
+- Given a pull request targets `main`, when CI runs, then the `pytest` job installs `requirements.txt` and executes `pytest`.
+- Given the suite fails, when the workflow finishes, then the pull request check is not green.
+
 ## Functional requirements
 
 | ID | Requirement |
@@ -92,6 +103,7 @@ No image mock exists. M-001 is the binding UI plan. Error, empty, and loading co
 | FR-009 | WHEN `GET /` is called, THE SYSTEM SHALL include a `dashboard` URL pointing at `/dashboard`. |
 | FR-010 | THE SYSTEM SHALL keep existing JSON endpoint contracts for `/players/top-scorers`, `/players/most-played`, and `/teams/{team}`. |
 | FR-011 | THE SYSTEM SHALL provide automated tests for top-scorers (including invalid `sort_by`), most-played (including unknown team and invalid limit), team profile (known and unknown team), and the dashboard page. |
+| FR-012 | WHEN a pull request targets `main`, THE SYSTEM SHALL run pytest in GitHub Actions before merge. |
 
 ## Non-functional requirements and constraints
 
@@ -104,6 +116,7 @@ No image mock exists. M-001 is the binding UI plan. Error, empty, and loading co
 | C-001 | Constraint | Serve the UI from the FastAPI app as static HTML/CSS/JS. No React, Vue, or npm frontend build. |
 | C-002 | Constraint | Do not add `/teams/ranking` or other new data endpoints. |
 | C-003 | Constraint | Tests run with pytest against FastAPI TestClient. |
+| C-004 | Constraint | CI is GitHub Actions via `.github/workflows/tests.yml` (job name `pytest`). |
 
 ## Rules, assumptions, and questions
 
@@ -124,4 +137,4 @@ No image mock exists. M-001 is the binding UI plan. Error, empty, and loading co
 - [x] High-impact questions are resolved.
 
 **Decision:** Approve  
-**Approved by / date:** Product request 2026-09-18
+**Approved by / date:** Product request 2026-09-18; CI added 2026-09-18

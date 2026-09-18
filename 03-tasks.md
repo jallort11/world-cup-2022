@@ -1,7 +1,7 @@
 # Tasks: World Cup 2022 API dashboard
 
 **Change ID:** dashboard-api-viz  
-**Approved input:** requirements v1.0, design v1.0  
+**Approved input:** requirements v1.1, design v1.1  
 **Status:** Complete
 
 ## Conventions
@@ -27,6 +27,7 @@
 - [x] T-021 [P] [FR-010, FR-011] [depends on: T-001] Tests for `/players/most-played`; evidence: VT-011.
 - [x] T-022 [P] [FR-010, FR-011] [depends on: T-001] Tests for `/teams/{team}`; evidence: VT-012.
 - [x] T-023 [FR-001, FR-009, FR-011, NFR-001, NFR-004] [depends on: T-012] Tests for `/` and `/dashboard` HTML; evidence: VT-001, VT-009.
+- [x] T-024 [FR-012, C-004] [depends on: T-020, T-021, T-022, T-023] Add `.github/workflows/tests.yml` so PRs to `main` run pytest; evidence: VT-014.
 
 ## Integration and quality
 
@@ -48,6 +49,7 @@
 | FR-009 | T-002, T-023 | VT-009 |
 | FR-010 | T-020, T-021, T-022 | VT-010, VT-011, VT-012 |
 | FR-011 | T-020–T-023 | pytest log |
+| FR-012 | T-024 | VT-014 |
 | NFR-001 | T-010, T-023 | VT-001, VT-013 |
 | NFR-002 | T-010, T-090 | VT-013 |
 | NFR-003 | T-011 | VT-003 |
@@ -55,6 +57,7 @@
 | C-001 | T-010, T-012 | static files |
 | C-002 | — | no ranking route added |
 | C-003 | T-001 | pytest |
+| C-004 | T-024 | VT-014 |
 
 - [x] Every approved requirement has at least one task and one test.
 - [x] Dependencies are explicit.
