@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>World Cup 2022 — Tournament dashboard</title>
+    <link rel="stylesheet" href="/static/dashboard.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-copy">
+        <p class="eyebrow">FIFA World Cup Qatar 2022</p>
+        <h1>Tournament dashboard</h1>
+        <p class="lede">Live views of the teaching API. Each panel names the endpoint it calls.</p>
+      </div>
+      <a class="docs-link" href="/docs">API docs</a>
+    </header>
+
+    <section class="overview" aria-labelledby="overview-heading">
+      <h2 id="overview-heading">Overview</h2>
+      <p class="source">source: GET /</p>
+      <p id="overview-status" class="status" role="status">Loading…</p>
+      <p id="overview-data" class="overview-data" hidden></p>
+    </section>
+
+    <form id="filters" class="filters">
+      <div class="field">
+        <label for="limit">Limit</label>
+        <input id="limit" name="limit" type="number" min="1" value="10" />
+      </div>
+      <div class="field">
+        <label for="sort-by">Scorers sort</label>
+        <select id="sort-by" name="sort_by">
+          <option value="goals" selected>goals</option>
+          <option value="assists">assists</option>
+        </select>
+      </div>
+      <div class="field field-wide">
+        <label for="minutes-team">Minutes team (optional)</label>
+        <input id="minutes-team" name="team" type="text" placeholder="e.g. Argentina" />
+      </div>
+      <div class="filter-actions">
+        <button type="submit">Apply</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
+
+    <div class="panels">
+      <section class="panel" aria-labelledby="scorers-heading">
+        <h2 id="scorers-heading">Top scorers</h2>
+        <p class="source">source: GET /players/top-scorers</p>
+        <p id="scorers-status" class="status" role="status">Loading…</p>
+        <div id="scorers-chart" class="bars" hidden></div>
+        <table id="scorers-table" hidden>
+          <caption>Top scorers</caption>
+          <thead>
+            <tr>
+              <th scope="col">Player</th>
+              <th scope="col">Team</th>
+              <th scope="col">Goals</th>
+              <th scope="col">Assists</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="panel" aria-labelledby="minutes-heading">
+        <h2 id="minutes-heading">Most minutes</h2>
+        <p class="source">source: GET /players/most-played</p>
+        <p id="minutes-status" class="status" role="status">Loading…</p>
+        <div id="minutes-chart" class="bars" hidden></div>
+        <table id="minutes-table" hidden>
+          <caption>Players with the most minutes</caption>
+          <thead>
+            <tr>
+              <th scope="col">Player</th>
+              <th scope="col">Team</th>
+              <th scope="col">Minutes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="panel panel-team" aria-labelledby="team-heading">
+      <h2 id="team-heading">Team profile</h2>
+      <p class="source">source: GET /teams/{team}</p>
+      <form id="team-form" class="team-form">
+        <div class="field">
+          <label for="team-name">Team name</label>
+          <input id="team-name" name="team" type="text" placeholder="Argentina" />
+        </div>
+        <button type="submit">Look up</button>
+      </form>
+      <p id="team-status" class="status" role="status">Look up a team to see its profile.</p>
+      <dl id="team-cards" class="team-cards" hidden></dl>
+    </section>
+
+    <script src="/static/dashboard.js" defer></script>
+  </body>
+</html>

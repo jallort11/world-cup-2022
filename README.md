@@ -1,211 +1,144 @@
-# World Cup 2022 API ⚽
+# World Cup 2022 API
 
-A small FastAPI project for the **Programming Thinking** pre-course.
+FastAPI teaching project for **Programming Thinking**. It serves 2022 World Cup player and team stats from CSV files, plus a browser dashboard that visualizes those endpoints.
 
-The goal is not to build a complex application. The goal is to practice:
+Team 2 added the dashboard, pytest coverage, and GitHub Actions.
 
-- reading and understanding an existing repository;
-- working with Git branches;
-- filtering, sorting and aggregating data with Pandas;
-- designing simple API endpoints;
-- testing an API through FastAPI `/docs`;
-- creating commits, pushing a branch and opening a Pull Request.
-
-## Setup
-
-Create and activate a virtual environment, then install dependencies:
+## Quick start
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate       # macOS/Linux
-# .venv\\Scripts\\activate      # Windows
+# .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-```
-
-Add the two CSV files described in `data/README.md`, then run:
-
-```bash
 uvicorn app.main:app --reload
 ```
 
-Open:
-
-- API: http://127.0.0.1:8000
-- Swagger UI: http://127.0.0.1:8000/docs
-
-## Git workflow
-
-Each team creates its own branch. For example:
+If port 8000 is already in use:
 
 ```bash
-git checkout -b feature/most-played
+uvicorn app.main:app --reload --port 8001
 ```
 
-After implementing and testing the endpoint:
+| Page | URL |
+|------|-----|
+| Dashboard | http://127.0.0.1:8000/dashboard |
+| API welcome | http://127.0.0.1:8000 |
+| Swagger UI | http://127.0.0.1:8000/docs |
 
-```bash
-git add .
-git commit -m "Add most played players endpoint"
-git push -u origin feature/most-played
-```
+## Dashboard
 
-Then open a Pull Request on GitHub.
+`GET /dashboard` loads a single page that calls the JSON API:
 
----
+- Overview from `GET /`
+- Top scorers chart and table (`limit`, `sort_by=goals|assists`)
+- Most minutes chart and table (`limit`, optional team)
+- Team profile lookup (`GET /teams/{team}`)
 
-# Team challenges
+Each panel shows loading, empty, and error states. Charts have a data table underneath.
 
-## Team 1 — Iron Players 🏃
+## API
 
-Implement:
+Interactive docs: http://127.0.0.1:8000/docs
 
-```http
-GET /players/most-played?limit=10
-```
+### `GET /`
 
-Return the players with the most minutes, ordered from highest to lowest.
-
-Expected fields:
+Returns how many rows were loaded and links to docs and the dashboard.
 
 ```json
-[
-  {"player": "...", "team": "...", "minutes": 690}
-]
+{
+  "message": "Welcome to the World Cup 2022 API",
+  "players_loaded": 40,
+  "teams_loaded": 32,
+  "docs": "/docs",
+  "dashboard": "/dashboard"
+}
 ```
 
-### Bonus
+### `GET /players/top-scorers`
 
-Support:
-
-```http
-GET /players/most-played?limit=10&team=Argentina
-```
-
-Think about:
-
-- How do you sort a DataFrame?
-- How do you return only N rows?
-- What should happen with an unknown team?
-- What should happen if `limit=0` or `limit=-5`?
-
----
-
-## Team 2 — Top Scorers ⚽
-
-Implement:
+| Query | Default | Notes |
+|-------|---------|--------|
+| `limit` | `10` | Must be ≥ 1 (otherwise 422) |
+| `sort_by` | `goals` | `goals` or `assists`. Anything else (e.g. `bananas`) → 422 |
 
 ```http
 GET /players/top-scorers?limit=10
+GET /players/top-scorers?sort_by=assists&limit=5
 ```
-
-Return the leading scorers with fields such as:
 
 ```json
 [
-  {"player": "...", "team": "...", "goals": 8, "assists": 2}
+  {"player": "Kylian Mbappe", "team": "France", "goals": 8, "assists": 2}
 ]
 ```
 
-### Bonus
+### `GET /players/most-played`
 
-Support:
-
-```http
-GET /players/top-scorers?sort_by=goals
-GET /players/top-scorers?sort_by=assists
-```
-
-Think about validation: what should happen with `sort_by=bananas`?
-
----
-
-## Team 3 — Team Ranking 🏆
-
-Implement:
+| Query | Default | Notes |
+|-------|---------|--------|
+| `limit` | `10` | Must be ≥ 1 (otherwise 400) |
+| `team` | omitted | Case-insensitive. Unknown team → 404 |
 
 ```http
-GET /teams/ranking?metric=goals
+GET /players/most-played?limit=10
+GET /players/most-played?limit=10&team=Argentina
 ```
-
-Allow useful metrics from the dataset, for example:
-
-```text
-goals
-possession
-shots
-assists
-```
-
-Example response:
 
 ```json
 [
-  {"team": "...", "value": 16},
-  {"team": "...", "value": 15}
+  {"player": "Lionel Messi", "team": "Argentina", "minutes": 690}
 ]
 ```
 
-Think about:
-
-- How can one endpoint sort using different columns?
-- Which metrics should be allowed?
-- What HTTP error should be returned for an invalid metric?
-
----
-
-## Team 4 — Team Profile 🔎
-
-Implement:
+### `GET /teams/{team}`
 
 ```http
-GET /teams/{team}
+GET /teams/Argentina
 ```
-
-Build a summary from the player data. For example:
 
 ```json
 {
   "team": "Argentina",
-  "players": 26,
+  "players": 5,
   "total_goals": 15,
   "total_assists": 8,
-  "average_age": 27.8,
-  "top_scorer": "..."
+  "average_age": 26.2,
+  "top_scorer": "Lionel Messi"
 }
 ```
 
-Think about:
+Unknown team currently returns `{"detail": "Team not found"}` with HTTP 200 (existing contract).
 
-- How do you filter all players belonging to one team?
-- How do you calculate aggregate values?
-- What should `/teams/Patatonia` return?
+## Tests
 
----
-
-# Final challenge 🚀
-
-After all Pull Requests have been merged, design together:
-
-```http
-GET /players/most-efficient?limit=10
+```bash
+source .venv/bin/activate
+pytest
 ```
 
-Define attacking contributions as:
+The suite covers top scorers, most-played, team profile, and that `/dashboard` is served.
 
-```text
-contributions = goals + assists
-```
+## CI
 
-and calculate contributions per 90 minutes:
+Pull requests and pushes to `main` run `.github/workflows/tests.yml` (job **pytest**): install `requirements.txt`, then `pytest -q`.
 
-```text
-contributions_per_90 = (goals + assists) / minutes * 90
-```
+Do not merge while that check is red. Optional: in GitHub, protect `main` with **Require status checks to pass** → `pytest`.
 
-Discuss edge cases before writing the code.
+## Dataset
 
-## Dataset note
+Teaching CSVs in `data/` (`players.csv`, `teams.csv`). See `data/README.md`. Not an official statistical source.
 
-For a quick classroom setup, use a 2022 World Cup player/team statistics dataset and commit a **small cleaned copy** to `data/`. Do not make students download or clean the source dataset during this exercise unless that is itself part of the lesson.
+## Spec-driven documents
 
-Useful public reference data exists in FBref's 2022 World Cup statistics and in the Fjelstul World Cup Database/DataHub. Check the source licence before redistributing a derived CSV and keep attribution in this README.
+This change was specified before code. Start here if you are reviewing the process:
+
+| File | Role |
+|------|------|
+| [00-constitution.md](00-constitution.md) | Stable rules |
+| [01-requirements.md](01-requirements.md) | User stories and requirements |
+| [assets/m-001-dashboard-wireframe.md](assets/m-001-dashboard-wireframe.md) | Binding UI plan |
+| [02-design.md](02-design.md) | Design |
+| [03-tasks.md](03-tasks.md) | Tasks |
+| [04-verification.md](04-verification.md) | Evidence |
+| [docs/sdd-kit.md](docs/sdd-kit.md) | How to use the SDD kit |

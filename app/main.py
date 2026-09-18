@@ -1,13 +1,18 @@
-from fastapi import FastAPI, Query
+from pathlib import Path
 from typing import Literal
+
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.data_loader import load_players, load_teams
 from app.teams import team_profile
 
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
 app = FastAPI(
     title="World Cup 2022 API",
-    description="Programming Thinking exercise: build a data API with FastAPI.",
+    description="Programming Thinking exercise: World Cup 2022 data API and dashboard. See README.md.",
     version="0.1.0",
 )
 
@@ -23,7 +28,14 @@ def root():
         "players_loaded": len(players),
         "teams_loaded": len(teams),
         "docs": "/docs",
+        "dashboard": "/dashboard",
     }
+
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse(STATIC_DIR / "dashboard.html")
+
 
 @app.get("/players/top-scorers")
 def top_scorers(
@@ -37,13 +49,14 @@ def top_scorers(
     )
     return ranked.to_dict(orient="records")
 
+
 app.get("/teams/{team}")(team_profile)
+
 
 @app.get("/players/most-played")
 def most_played(
     limit: int = Query(10, description="Number of players to return (must be 1 or more)."),
     team: str | None = Query(None, description="Filter by team, e.g. Argentina."),
-    
 ):
     # A limit of 0 or a negative number makes no sense: reject it instead of returning nothing.
     if limit < 1:
@@ -60,21 +73,10 @@ def most_played(
         if result.empty:
             raise HTTPException(status_code=404, detail=f"Team '{team}' not found.")
 
-
     # Highest minutes first (ascending=False). Ties on minutes are broken
     # alphabetically by player so the output is stable.
     result = result.sort_values(["minutes", "player"], ascending=[False, True]).head(limit)
-    return result[["player", "team", "minutes"]].to_dict(orient="records")
+    return result[["player", "team", "minutes"]].astype({"minutes": int}).to_dict(orient="records")
 
 
-# -----------------------------------------------------------------------------
-# STUDENT EXERCISE
-# -----------------------------------------------------------------------------
-# Implement the endpoints described in README.md.
-# Suggested routes:
-#   GET /players/most-played
-#   GET /players/top-scorers
-#   GET /teams/ranking
-#   GET /teams/{team}
-#
-# Do not implement them on main: each team should work on its own Git branch.
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
